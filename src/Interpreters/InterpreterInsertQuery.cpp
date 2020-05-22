@@ -262,11 +262,8 @@ BlockIO InterpreterInsertQuery::execute()
     {
         const auto & header = out_streams.at(0)->getHeader();
 
-        res.pipeline.addSimpleTransform([&](const Block & in_header, QueryPipeline::StreamType type) -> ProcessorPtr
+        res.pipeline.addSimpleTransform([&](const Block & in_header) -> ProcessorPtr
         {
-            if (type != QueryPipeline::StreamType::Main)
-                return nullptr;
-
             return std::make_shared<ConvertingTransform>(in_header, header,
                     ConvertingTransform::MatchColumnsMode::Position);
         });

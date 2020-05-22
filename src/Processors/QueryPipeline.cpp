@@ -584,11 +584,14 @@ void QueryPipeline::unitePipelines(
     {
         pipeline.checkInitialized();
 
-        pipeline.addSimpleTransform([&](const Block & header)
+        if (!pipeline.isCompleted())
         {
-           return std::make_shared<ConvertingTransform>(
-                   header, common_header, ConvertingTransform::MatchColumnsMode::Position);
-        });
+            pipeline.addSimpleTransform([&](const Block & header)
+            {
+               return std::make_shared<ConvertingTransform>(
+                       header, common_header, ConvertingTransform::MatchColumnsMode::Position);
+            });
+        }
 
         if (pipeline.extremes_port)
         {
