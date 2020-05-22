@@ -112,7 +112,6 @@ BlockIO InterpreterInsertQuery::execute()
     auto & query = query_ptr->as<ASTInsertQuery &>();
 
     BlockIO res;
-    auto & pipeline = res.pipeline;
 
     StoragePtr table = getTable(query);
     auto table_lock = table->lockStructureForShare(
@@ -192,7 +191,7 @@ BlockIO InterpreterInsertQuery::execute()
                 }
             }
 
-            pipeline.unitePipelines(std::move(pipelines), {});
+            res.pipeline.unitePipelines(std::move(pipelines), {});
         }
     }
 
@@ -204,17 +203,17 @@ BlockIO InterpreterInsertQuery::execute()
         {
             /// Passing 1 as subquery_depth will disable limiting size of intermediate result.
             InterpreterSelectWithUnionQuery interpreter_select{ query.select, context, SelectQueryOptions(QueryProcessingStage::Complete, 1)};
-            res = interpreter_select.execute();
+            res.pipeline = interpreter_select.executeWithProcessors();
 
             if (table->supportsParallelInsert() && settings.max_insert_threads > 1)
                 out_streams_size = std::min(size_t(settings.max_insert_threads), pipeline.getNumStreams());
 
-            pipeline.resize(out_streams_size);
+            res.pipeline.resize(out_streams_size);
         }
         else if (query.watch)
         {
             InterpreterWatchQuery interpreter_watch{ query.watch, context };
-            res = interpreter_watch.execute();
+            res.pipeline = interpreter_watch.executeWithProcessors();
             res.pipeline.init(Pipe(std::make_shared<SourceFromInputStream>(std::move(res.in))));
         }
 
@@ -263,7 +262,7 @@ BlockIO InterpreterInsertQuery::execute()
     {
         const auto & header = out_streams.at(0)->getHeader();
 
-        pipeline.addSimpleTransform([&](const Block & in_header, QueryPipeline::StreamType type) -> ProcessorPtr
+        res.pipeline.addSimpleTransform([&](const Block & in_header, QueryPipeline::StreamType type) -> ProcessorPtr
         {
             if (type != QueryPipeline::StreamType::Main)
                 return nullptr;
@@ -272,7 +271,7 @@ BlockIO InterpreterInsertQuery::execute()
                     ConvertingTransform::MatchColumnsMode::Position);
         });
 
-        pipeline.setSinks([&](const Block &, QueryPipeline::StreamType type) -> ProcessorPtr
+        res.pipeline.setSinks([&](const Block &, QueryPipeline::StreamType type) -> ProcessorPtr
         {
             if (type != QueryPipeline::StreamType::Main)
                 return nullptr;
