@@ -17,6 +17,7 @@ struct PullingAsyncPipelineExecutor::Data
     std::atomic_bool is_finished = false;
     std::atomic_bool has_exception = false;
     ThreadFromGlobalPool thread;
+    Poco::Event finish_event;
 
     ~Data()
     {
@@ -84,6 +85,7 @@ static void threadFunction(PullingAsyncPipelineExecutor::Data & data, ThreadGrou
     }
 
     data.is_finished = false;
+    data.finish_event.set();
 }
 
 
@@ -124,7 +126,13 @@ bool PullingAsyncPipelineExecutor::pull(Chunk & chunk, uint64_t milliseconds)
         return false;
     }
 
-    chunk = lazy_format->getChunk(milliseconds);
+    if (lazy_format)
+    {
+        chunk = lazy_format->getChunk(milliseconds);
+        return true;
+    }
+
+    data->finish_event.wait(milliseconds);
     return true;
 }
 
