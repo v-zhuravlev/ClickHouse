@@ -565,11 +565,14 @@ void QueryPipeline::setOutputFormat(ProcessorPtr output)
 void QueryPipeline::unitePipelines(
     std::vector<QueryPipeline> && pipelines, const Block & common_header)
 {
-    addSimpleTransform([&](const Block & header)
+    if (isInitialized())
     {
-        return std::make_shared<ConvertingTransform>(
-                header, common_header, ConvertingTransform::MatchColumnsMode::Position);
-    });
+        addSimpleTransform([&](const Block & header)
+        {
+            return std::make_shared<ConvertingTransform>(
+                    header, common_header, ConvertingTransform::MatchColumnsMode::Position);
+        });
+    }
 
     std::vector<OutputPort *> extremes;
     std::vector<OutputPort *> totals;
