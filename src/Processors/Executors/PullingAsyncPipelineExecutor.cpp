@@ -84,7 +84,7 @@ static void threadFunction(PullingAsyncPipelineExecutor::Data & data, ThreadGrou
         data.has_exception = true;
     }
 
-    data.is_finished = false;
+    data.is_finished = true;
     data.finish_event.set();
 }
 
