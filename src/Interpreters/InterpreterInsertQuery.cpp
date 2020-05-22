@@ -32,6 +32,7 @@
 #include <Processors/NullSink.h>
 #include <Processors/Transforms/ConvertingTransform.h>
 #include <Processors/Sources/SinkToOutputStream.h>
+#include <Processors/ConcatProcessor.h>
 
 
 namespace DB
@@ -208,7 +209,10 @@ BlockIO InterpreterInsertQuery::execute()
             if (table->supportsParallelInsert() && settings.max_insert_threads > 1)
                 out_streams_size = std::min(size_t(settings.max_insert_threads), res.pipeline.getNumStreams());
 
-            res.pipeline.resize(out_streams_size);
+            if (out_streams_size == 1)
+                res.pipeline.addPipe({std::make_shared<ConcatProcessor>(res.pipeline.getHeader(), res.pipeline.getNumStreams())});
+            else
+                res.pipeline.resize(out_streams_size);
         }
         else if (query.watch)
         {
