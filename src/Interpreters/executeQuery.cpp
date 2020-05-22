@@ -610,7 +610,7 @@ BlockIO executeQuery(
 {
     BlockIO res = executeQuery(query, context, internal, stage, may_have_embedded_data);
 
-    if (!allow_processors && res.pipeline.isInitialized())
+    if (!allow_processors && res.pipeline.initialized())
         res.in = res.getInputStream();
 
     return res;
@@ -717,7 +717,7 @@ void executeQuery(
             copyData(*streams.in, *out, [](){ return false; }, [&out](const Block &) { out->flush(); });
         }
 
-        if (pipeline.isInitialized())
+        if (pipeline.initialized())
         {
             const ASTQueryWithOutput * ast_query_with_output = dynamic_cast<const ASTQueryWithOutput *>(ast.get());
 

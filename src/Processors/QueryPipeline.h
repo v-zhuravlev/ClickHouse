@@ -81,8 +81,8 @@ public:
     /// All pipes must have same header.
     void init(Pipes pipes);
     void init(Pipe pipe); /// Simple init for single pipe
-    bool isInitialized() { return !processors.empty(); }
-    bool isCompleted() { return isInitialized() && streams.empty(); }
+    bool initialized() { return !processors.empty(); }
+    bool isCompleted() { return initialized() && streams.empty(); }
 
     /// Type of logical data stream for simple transform.
     /// Sometimes it's important to know which part of pipeline we are working for.

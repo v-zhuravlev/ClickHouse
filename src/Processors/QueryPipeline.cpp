@@ -30,7 +30,7 @@ namespace ErrorCodes
 
 void QueryPipeline::checkInitialized()
 {
-    if (!isInitialized())
+    if (!initialized())
         throw Exception("QueryPipeline wasn't initialized.", ErrorCodes::LOGICAL_ERROR);
 }
 
@@ -122,7 +122,7 @@ static OutputPort * uniteTotals(const std::vector<OutputPort *> & ports, const B
 
 void QueryPipeline::init(Pipes pipes)
 {
-    if (isInitialized())
+    if (initialized())
         throw Exception("Pipeline has already been initialized.", ErrorCodes::LOGICAL_ERROR);
 
     if (pipes.empty())
@@ -565,7 +565,7 @@ void QueryPipeline::setOutputFormat(ProcessorPtr output)
 void QueryPipeline::unitePipelines(
     std::vector<QueryPipeline> && pipelines, const Block & common_header)
 {
-    if (isInitialized())
+    if (initialized())
     {
         addSimpleTransform([&](const Block & header)
         {
