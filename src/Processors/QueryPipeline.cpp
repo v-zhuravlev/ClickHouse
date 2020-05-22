@@ -776,10 +776,8 @@ Pipe QueryPipeline::getPipe() &&
 
 PipelineExecutorPtr QueryPipeline::execute()
 {
-    checkInitializedAndNotCompleted();
-
-    if (!output_format)
-        throw Exception("Cannot execute pipeline because it doesn't have output.", ErrorCodes::LOGICAL_ERROR);
+    if (!isCompleted())
+        throw Exception("Cannot execute pipeline because it is not completed.", ErrorCodes::LOGICAL_ERROR);
 
     return std::make_shared<PipelineExecutor>(processors, process_list_element);
 }
