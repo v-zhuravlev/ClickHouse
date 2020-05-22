@@ -151,7 +151,7 @@ private:
         }
 
         bool hasDelayedStream() const { return stream_with_non_joined_data != nullptr; }
-        bool initialized() const { return !streams.empty(); }
+        bool isInitialized() const { return !streams.empty(); }
 
         /// Compatibility with QueryPipeline (Processors)
         void   setMaxThreads(size_t max_threads_) { max_threads = max_threads_; }

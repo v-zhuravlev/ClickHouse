@@ -1355,7 +1355,7 @@ void InterpreterSelectQuery::executeFetchColumns(
         throw Exception("Setting 'max_block_size' cannot be zero", ErrorCodes::PARAMETER_OUT_OF_BOUND);
 
     /// Initialize the initial data streams to which the query transforms are superimposed. Table or subquery or prepared input?
-    if (pipeline.initialized())
+    if (pipeline.isInitialized())
     {
         /// Prepared input.
     }
