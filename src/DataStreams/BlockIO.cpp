@@ -19,7 +19,7 @@ BlockInputStreamPtr BlockIO::getInputStream()
     if (in)
         return in;
 
-    if (pipeline.initialized())
+    if (pipeline.isInitialized())
         return std::make_shared<PipelineExecutingBlockInputStream>(std::move(pipeline));
 
     throw Exception("Cannot get input stream from BlockIO because query pipeline was not initialized",

@@ -28,6 +28,7 @@ private:
     {
     public:
         auto size() const { return data.size(); }
+        bool empty() const { return size() == 0; }
         auto begin() { return data.begin(); }
         auto end() { return data.end(); }
         auto & front() { return data.front(); }
@@ -80,7 +81,8 @@ public:
     /// All pipes must have same header.
     void init(Pipes pipes);
     void init(Pipe pipe); /// Simple init for single pipe
-    bool initialized() { return !processors.empty(); }
+    bool isInitialized() { return !processors.empty(); }
+    bool isCompleted() { return isInitialized() && streams.empty(); }
 
     /// Type of logical data stream for simple transform.
     /// Sometimes it's important to know which part of pipeline we are working for.
@@ -101,7 +103,8 @@ public:
     void addTotalsHavingTransform(ProcessorPtr transform);
     void addExtremesTransform();
     void addCreatingSetsTransform(ProcessorPtr transform);
-    void setOutput(ProcessorPtr output);
+    void setOutputFormat(ProcessorPtr output);
+    void setSinks(const ProcessorGetterWithStreamKind & getter);
 
     /// Add totals which returns one chunk with single row with defaults.
     void addDefaultTotals();
@@ -193,6 +196,7 @@ private:
     QueryStatus * process_list_element = nullptr;
 
     void checkInitialized();
+    void checkInitializedAndNotCompleted();
     static void checkSource(const ProcessorPtr & source, bool can_have_totals);
 
     template <typename TProcessorGetter>

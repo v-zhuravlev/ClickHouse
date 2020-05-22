@@ -267,7 +267,7 @@ void TCPHandler::runImpl()
                 state.io.in->read();
                 state.io.onFinish();
             }
-            else if (state.io.pipeline.initialized())
+            else if (state.io.pipeline.isInitialized())
                 processOrdinaryQueryWithProcessors();
             else
                 processOrdinaryQuery();
