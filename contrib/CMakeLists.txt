@@ -326,3 +326,5 @@ endif()
 if (USE_FASTOPS)
     add_subdirectory (fastops-cmake)
 endif()
+
+add_subdirectory (fmtlib-cmake)
