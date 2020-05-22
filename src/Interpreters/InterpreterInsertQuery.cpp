@@ -206,7 +206,7 @@ BlockIO InterpreterInsertQuery::execute()
             res.pipeline = interpreter_select.executeWithProcessors();
 
             if (table->supportsParallelInsert() && settings.max_insert_threads > 1)
-                out_streams_size = std::min(size_t(settings.max_insert_threads), pipeline.getNumStreams());
+                out_streams_size = std::min(size_t(settings.max_insert_threads), res.pipeline.getNumStreams());
 
             res.pipeline.resize(out_streams_size);
         }
