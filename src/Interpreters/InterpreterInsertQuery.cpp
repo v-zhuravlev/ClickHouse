@@ -254,11 +254,14 @@ BlockIO InterpreterInsertQuery::execute()
             out = std::move(out_wrapper);
             out_streams.emplace_back(std::move(out));
         }
-
     }
 
     /// What type of query: INSERT or INSERT SELECT or INSERT WATCH?
-    if (query.select || query.watch)
+    if (is_distributed_insert_select)
+    {
+        /// Pipeline was already built.
+    }
+    else if (query.select || query.watch)
     {
         const auto & header = out_streams.at(0)->getHeader();
 
