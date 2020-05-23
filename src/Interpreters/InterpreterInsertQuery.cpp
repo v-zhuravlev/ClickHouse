@@ -217,7 +217,7 @@ BlockIO InterpreterInsertQuery::execute()
         else if (query.watch)
         {
             InterpreterWatchQuery interpreter_watch{ query.watch, context };
-            res.pipeline = interpreter_watch.executeWithProcessors();
+            res = interpreter_watch.execute();
             res.pipeline.init(Pipe(std::make_shared<SourceFromInputStream>(std::move(res.in))));
         }
 
