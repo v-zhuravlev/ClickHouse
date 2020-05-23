@@ -260,8 +260,15 @@ void TCPHandler::runImpl()
             /// Does the request require receive data from client?
             if (state.need_receive_data_for_insert)
                 processInsertQuery(connection_settings);
+            else if (state.need_receive_data_for_input)
+            {
+                /// It is special case for input(), all works for reading data from client will be done in callbacks.
+                auto executor = state.io.pipeline.execute();
+                executor->execute(state.io.pipeline.getNumThreads());
+                state.io.onFinish();
+            }
             else if (state.io.pipeline.initialized())
-                processOrdinaryQueryWithProcessors(state.need_receive_data_for_input);
+                processOrdinaryQueryWithProcessors();
             else
                 processOrdinaryQuery();
 
@@ -546,7 +553,7 @@ void TCPHandler::processOrdinaryQuery()
 }
 
 
-void TCPHandler::processOrdinaryQueryWithProcessors(bool need_receive_data_for_input)
+void TCPHandler::processOrdinaryQueryWithProcessors()
 {
     auto & pipeline = state.io.pipeline;
 
@@ -595,7 +602,7 @@ void TCPHandler::processOrdinaryQueryWithProcessors(bool need_receive_data_for_i
           *  because we have not read all the data yet,
           *  and there could be ongoing calculations in other threads at the same time.
           */
-        if (!isQueryCancelled() && !need_receive_data_for_input)
+        if (!isQueryCancelled())
         {
             sendTotals(executor.getTotalsBlock());
             sendExtremes(executor.getExtremesBlock());

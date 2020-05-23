@@ -171,7 +171,7 @@ private:
     /// Process a request that does not require the receiving of data blocks from the client
     void processOrdinaryQuery();
 
-    void processOrdinaryQueryWithProcessors(bool need_receive_data_for_input);
+    void processOrdinaryQueryWithProcessors();
 
     void processTablesStatusRequest();
 
