@@ -342,6 +342,9 @@ static std::tuple<ASTPtr, BlockIO> executeQueryImpl(
         else
             res = interpreter->execute();
 
+        if (res.pipeline.initialized())
+            use_processors = true;
+
         if (const auto * insert_interpreter = typeid_cast<const InterpreterInsertQuery *>(&*interpreter))
         {
             /// Save insertion table (not table function). TODO: support remote() table function.
