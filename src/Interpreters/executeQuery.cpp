@@ -766,6 +766,10 @@ void executeQuery(
 
                 pipeline.setOutputFormat(std::move(out));
             }
+            else
+            {
+                pipeline.setProgressCallback(context.getProgressCallback());
+            }
 
             {
                 auto executor = pipeline.execute();
