@@ -372,7 +372,7 @@ static std::tuple<ASTPtr, BlockIO> executeQueryImpl(
             /// Limits apply only to the final result.
             pipeline.setProgressCallback(context.getProgressCallback());
             pipeline.setProcessListElement(context.getProcessListElement());
-            if (stage == QueryProcessingStage::Complete)
+            if (stage == QueryProcessingStage::Complete && !pipeline.isCompleted())
             {
                 pipeline.resize(1);
                 pipeline.addSimpleTransform([&](const Block & header)
